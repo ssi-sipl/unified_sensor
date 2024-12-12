@@ -38,7 +38,7 @@ void loop() {
 
   Serial.print("Wind speed: ");
   Serial.print(windSpeed);
-  Serial.println(" units");
+  Serial.println("m/s");
 
   // Wait before next measurement
   delay(sensorDelay);
