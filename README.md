@@ -23,7 +23,7 @@ Install the following libraries via Arduino Library Manager:
 - `Adafruit Unified Sensor`
 
 
-## 🔌 Circuit Diagram
+## 🔌 Pin Connections
 
 | Arduino Pin | Connected To         |
 |-------------|----------------------|
@@ -32,6 +32,8 @@ Install the following libraries via Arduino Library Manager:
 | GND         | Common Ground        |
 | SDA         | BME280 SDA           |
 | SCL         | BME280 SCL           |
+
+## 🔌 Circuit Diagram
 ![Circuit Diagram](https://raw.githubusercontent.com/ssi-sipl/unified_sensor/main/circuit_image.png)
 
 ## 🧠 How It Works
