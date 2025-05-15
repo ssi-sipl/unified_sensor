@@ -1,18 +1,20 @@
-
 #include <Arduino.h>
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BME280.h>
 
-#define NUM_SAMPLES 10  // Number of readings to average for wind sensor
-#define SEALEVELPRESSURE_HPA (1023.25)  // Adjust to your local pressure
+#define NUM_SAMPLES 8
+#define SEALEVELPRESSURE_HPA (1023.25)
 
-Adafruit_BME280 bme;  // BME280 sensor object
+Adafruit_BME280 bme;
+
+float mapfloat(float x, float in_min, float in_max, float out_min, float out_max) {
+  return max(0.0f, (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min);
+}
 
 void setup() {
   Serial.begin(9600);
 
-  // Initialize BME280 sensor
   if (!bme.begin(0x76)) {
     Serial.println("Could not find a valid BME280 sensor, check wiring!");
     while (1);
@@ -20,64 +22,33 @@ void setup() {
 }
 
 void loop() {
-  // Read and process wind speed sensor data
+  // Wind Speed Reading
   float sensorValue = 0;
   for (int i = 0; i < NUM_SAMPLES; i++) {
     sensorValue += analogRead(A0);
-    delay(10);  // Short delay to stabilize readings
+    delay(10);
   }
   sensorValue /= NUM_SAMPLES;
 
-  // Convert raw ADC value to voltage
   float voltage = sensorValue * (5.0 / 1023.0);
-
-  // Convert voltage to wind speed (m/s)
   float wind_speed = mapfloat(voltage, 0.4, 2.0, 0, 32.4);
-  wind_speed = max(0.0, wind_speed);  // Clamp negative values to zero
+  wind_speed = max(0.0f, wind_speed);
+  float speed_kph = wind_speed * 3.6;
 
-  // Convert wind speed to km/h
-  float speed_kmh = wind_speed * 3.6;
-
-  // Read BME280 sensor data
+  // BME280 Readings
   float temperature = bme.readTemperature();
-  float pressure = bme.readPressure() / 100.0F;  // Convert Pa to hPa
+  float pressure = bme.readPressure() / 100.0F;
   float altitude = bme.readAltitude(SEALEVELPRESSURE_HPA);
   float humidity = bme.readHumidity();
 
-  // Print wind speed data
-  Serial.print("Wind Speed = ");
-  Serial.print(wind_speed, 2);
-  Serial.println(" m/s");
+  // JSON Output
+  Serial.print("{");
+  Serial.print("\"wind_speed_kph\": "); Serial.print(speed_kph, 2); Serial.print(", ");
+  Serial.print("\"temperature_C\": "); Serial.print(temperature, 2); Serial.print(", ");
+  Serial.print("\"pressure_hPa\": "); Serial.print(pressure, 2); Serial.print(", ");
+  Serial.print("\"altitude_m\": "); Serial.print(altitude, 2); Serial.print(", ");
+  Serial.print("\"humidity_pct\": "); Serial.print(humidity, 2);
+  Serial.println("}");
 
-  Serial.print("Wind Speed = ");
-  Serial.print(speed_kmh, 2);
-  Serial.println(" km/h");
-
-  Serial.println(" ");
-
-  // Print BME280 sensor data
-  Serial.print("Temperature = ");
-  Serial.print(temperature);
-  Serial.println(" *C");
-
-  Serial.print("Pressure = ");
-  Serial.print(pressure);
-  Serial.println(" hPa");
-
-  Serial.print("Approx. Altitude = ");
-  Serial.print(altitude);
-  Serial.println(" m");
-
-  Serial.print("Humidity = ");
-  Serial.print(humidity);
-  Serial.println(" %");
-
-  Serial.println();
-
-  delay(1000);  // Delay before next readings
-}
-
-// Function to map float values
-float mapfloat(float x, float in_min, float in_max, float out_min, float out_max) {
-  return max(0.0, (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min);
+  delay(1000);  // 1-second delay between readings
 }
