@@ -4,7 +4,7 @@ import json
 from datetime import datetime
 
 # Update the port name as per your system
-ser = serial.Serial('/dev/ttyUSB0', 9600)
+ser = serial.Serial('/dev/ttyACM0', 9600)
 time.sleep(2)
 
 while True:
