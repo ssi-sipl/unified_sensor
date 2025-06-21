@@ -4,7 +4,7 @@
 #include <Adafruit_BME280.h>
 
 #define NUM_SAMPLES 8
-#define SEALEVELPRESSURE_HPA (1023.25)
+#define SEALEVELPRESSURE_HPA (1001.25)
 
 Adafruit_BME280 bme;
 
